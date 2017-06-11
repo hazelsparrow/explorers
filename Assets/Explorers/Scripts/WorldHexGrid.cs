@@ -13,6 +13,7 @@ namespace Explorers {
     public GameObject hex5;
     public GameObject hex6;
     public GameObject hex7;
+    public GameObject hex8;
 
     private List<GameObject> tiles = new List<GameObject>();
 
@@ -24,6 +25,7 @@ namespace Explorers {
       tiles.Add(hex5);
       tiles.Add(hex6);
       tiles.Add(hex7);
+      tiles.Add(hex8);
 
       CreateGrid();
     }
@@ -49,9 +51,9 @@ namespace Explorers {
           if (false == grid[idx].isValid) continue;
 
           // create a new tile
-          GameObject go = (GameObject)Instantiate(tiles[Random.Range(0, 7)]);
+          GameObject go = Instantiate(tiles[Random.Range(0, 8)]);
           go.name = "Tile " + idx.ToString();
-          go.transform.position = grid[idx].position;
+          go.transform.position = new Vector3(grid[idx].position.x, grid[idx].position.y, grid[idx].position.z);
           go.transform.parent = parent;
         }
 
