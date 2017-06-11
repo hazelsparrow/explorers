@@ -137,7 +137,8 @@ namespace MapNavKit
 							py = nodeSize * Mathf.Sqrt(3) * (y + x * 0.5f);
 						}
 
-						grid[idx].localPosition = new Vector3(px, nodeHeightStep * grid[idx].h, py);
+						grid[idx].localPosition = new Vector3(px, py, nodeHeightStep * grid[idx].h);
+            grid[idx].parent.rotation = Quaternion.Euler(-90, 0, 0);
 
 						OnNodeCreated(grid[idx]);
 					}

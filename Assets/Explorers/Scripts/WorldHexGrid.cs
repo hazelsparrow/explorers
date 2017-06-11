@@ -15,6 +15,8 @@ namespace Explorers {
     public GameObject hex7;
     public GameObject hex8;
 
+    public GameObject player;
+
     private List<GameObject> tiles = new List<GameObject>();
 
     public void Start() {
@@ -53,10 +55,9 @@ namespace Explorers {
           // create a new tile
           GameObject go = Instantiate(tiles[Random.Range(0, 8)]);
           go.name = "Tile " + idx.ToString();
-          go.transform.position = new Vector3(grid[idx].position.x, grid[idx].position.y, grid[idx].position.z);
+          go.transform.position = grid[idx].position;
           go.transform.parent = parent;
-        }
-
+        }   
       }
 
       // else, simply update the position of existing tiles
@@ -70,9 +71,20 @@ namespace Explorers {
           go.transform.position = grid[idx].position;
         }
       }
+
+
+      // player
+      player.transform.position = NodeAt<MapNavNode>(0, 0).position;
     }
 
     protected void Update() {
+      if (Input.GetMouseButtonDown(0)) {
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        var result = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero);
+        Debug.Log(result.collider);
+        var go = result.collider.gameObject;
+        Debug.Log(go.name);
+      }
     }
 
     // ------------------------------------------------------------------------------------------------------------
