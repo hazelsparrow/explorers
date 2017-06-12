@@ -16,6 +16,7 @@ namespace Explorers {
     public GameObject hex8;
 
     public GameObject player;
+    private TileFactory factory;
 
     private List<GameObject> tiles = new List<GameObject>();
 
@@ -29,7 +30,8 @@ namespace Explorers {
       tiles.Add(hex7);
       tiles.Add(hex8);
 
-      CreateGrid();
+      factory = GameObject.Find("Engine").GetComponent<TileFactory>();
+      CreateGrid<Tile>();
     }
 
     public override void OnGridChanged(bool created) {
@@ -53,8 +55,10 @@ namespace Explorers {
           if (false == grid[idx].isValid) continue;
 
           // create a new tile
-          GameObject go = Instantiate(tiles[Random.Range(0, 8)]);
-          go.name = "Tile " + idx.ToString();
+          var tile = (Tile)grid[idx];
+          factory.ConfigureRandomTile(tile);
+          GameObject go = Instantiate(tile.Sprite);
+          go.name = "T" + idx.ToString();
           go.transform.position = grid[idx].position;
           go.transform.parent = parent;
         }   
@@ -67,7 +71,7 @@ namespace Explorers {
           if (false == grid[idx].isValid) continue;
 
           // Since I gave the tiles proper names I can easily find them by name
-          GameObject go = parent.Find("Tile " + idx.ToString()).gameObject;
+          GameObject go = parent.Find("T" + idx.ToString()).gameObject;
           go.transform.position = grid[idx].position;
         }
       }
@@ -79,11 +83,13 @@ namespace Explorers {
 
     protected void Update() {
       if (Input.GetMouseButtonDown(0)) {
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         var result = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero);
-        Debug.Log(result.collider);
         var go = result.collider.gameObject;
-        Debug.Log(go.name);
+        var index = int.Parse(go.name.Remove(0, 1));
+        player.transform.position = grid[index].position;
+
+        var tile = (Tile)grid[index];
+        Debug.Log(tile.Type);
       }
     }
 
