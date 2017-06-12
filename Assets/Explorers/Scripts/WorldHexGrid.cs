@@ -6,30 +6,12 @@ using MapNavKit;
 namespace Explorers {
 
   public class WorldHexGrid : MapNavHexa {
-    public GameObject hex1;
-    public GameObject hex2;
-    public GameObject hex3;
-    public GameObject hex4;
-    public GameObject hex5;
-    public GameObject hex6;
-    public GameObject hex7;
-    public GameObject hex8;
-
     public GameObject player;
     private TileFactory factory;
 
     private List<GameObject> tiles = new List<GameObject>();
 
     public void Start() {
-      tiles.Add(hex1);
-      tiles.Add(hex2);
-      tiles.Add(hex3);
-      tiles.Add(hex4);
-      tiles.Add(hex5);
-      tiles.Add(hex6);
-      tiles.Add(hex7);
-      tiles.Add(hex8);
-
       factory = GameObject.Find("Engine").GetComponent<TileFactory>();
       CreateGrid<Tile>();
     }
@@ -61,7 +43,7 @@ namespace Explorers {
           go.name = "T" + idx.ToString();
           go.transform.position = grid[idx].position;
           go.transform.parent = parent;
-        }   
+        }
       }
 
       // else, simply update the position of existing tiles
@@ -79,6 +61,26 @@ namespace Explorers {
 
       // player
       player.transform.position = NodeAt<MapNavNode>(0, 0).position;
+      var currentTile = NodeAt<Tile>(0, 0);
+      ExploreAroundTile(currentTile);
+      player.GetComponent<Unit>().tile = currentTile;
+      GameObject.Find("Engine").GetComponent<HexFog>().InitFog();
+    }
+
+    public void ExploreAroundTile(Tile tile) {
+      foreach (var node in NodesAround<Tile>(tile, 1, null)) {
+        node.Explored = true;
+        Debug.Log("explored: " + node);
+      }
+      tile.Explored = true;
+    }
+
+    protected virtual float OnNodeCostCallback(MapNavNode fromNode, MapNavNode toNode) {
+      var tile = (Tile)toNode;
+      return tile.MoveCost;
+    }
+
+    protected void OnUnitMoveComplete() {
     }
 
     protected void Update() {
@@ -86,11 +88,23 @@ namespace Explorers {
         var result = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero);
         var go = result.collider.gameObject;
         var index = int.Parse(go.name.Remove(0, 1));
-        player.transform.position = grid[index].position;
+        //player.transform.position = grid[index].position;
 
         var tile = (Tile)grid[index];
         Debug.Log(tile.Type);
+
+        var unit = player.GetComponent<Unit>();
+
+        List<MapNavNode> path = Path<MapNavNode>(unit.tile, tile, OnNodeCostCallback);
+        Debug.Log(path.Count);
+        if (path != null) {
+          //unitMoving = true; // need to wait while unit is moving
+          //ClearMoveMarkers();
+          unit.Move(path, OnUnitMoveComplete);
+        }
       }
+
+
     }
 
     // ------------------------------------------------------------------------------------------------------------

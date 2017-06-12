@@ -10,6 +10,7 @@ public class TileFactory : MonoBehaviour {
   public GameObject Mountain = null;
   public GameObject Ocean = null;
   public GameObject Plains = null;
+  public GameObject Fog = null;
 
   // Use this for initialization
   void Start() {
@@ -57,5 +58,7 @@ public class TileFactory : MonoBehaviour {
       default:
         throw new System.Exception("Boo");
     }
+
+    tile.Explored = false;
   }
 }

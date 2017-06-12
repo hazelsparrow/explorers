@@ -17,6 +17,8 @@ public enum TileType {
 public class Tile : MapNavNode {
   public TileType Type = TileType.Fog;
   public GameObject Sprite = null;
+  public Unit Unit = null;
+  public bool Explored = false;
 
   // Use this for initialization
   void Start() {
@@ -26,5 +28,17 @@ public class Tile : MapNavNode {
   // Update is called once per frame
   void Update() {
 
+  }
+
+  public float MoveCost {
+    get {
+      switch (Type) {
+        case TileType.Ocean:
+        case TileType.Mountain:
+          return 0f;
+        default:
+          return 1f;
+      }
+    }
   }
 }
