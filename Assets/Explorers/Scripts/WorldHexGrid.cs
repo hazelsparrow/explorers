@@ -64,13 +64,13 @@ namespace Explorers {
       var currentTile = NodeAt<Tile>(0, 0);
       ExploreAroundTile(currentTile);
       player.GetComponent<Unit>().tile = currentTile;
+      Debug.Log(NodeAt<Tile>(0, 0).Explored);
       GameObject.Find("Engine").GetComponent<HexFog>().InitFog();
     }
 
     public void ExploreAroundTile(Tile tile) {
       foreach (var node in NodesAround<Tile>(tile, 1, null)) {
         node.Explored = true;
-        Debug.Log("explored: " + node);
       }
       tile.Explored = true;
     }

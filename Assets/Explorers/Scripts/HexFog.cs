@@ -14,9 +14,9 @@ public class HexFog : MonoBehaviour {
     Map = GameObject.Find("HexGrid").GetComponent<WorldHexGrid>();
     for (int i = 0; i < Map.grid.Length; i++) {
       Tile tile = (Tile)Map.grid[i];
-      if (!tile.Explored) {
+      if (!tile.Explored && tile.isValid) {
         fogByTiles[tile] = Instantiate(Fog);
-        fogByTiles[tile].transform.position = tile.localPosition;
+        fogByTiles[tile].transform.position = tile.position;
       }
     }
   }
