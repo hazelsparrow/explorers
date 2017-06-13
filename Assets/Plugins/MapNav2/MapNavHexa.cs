@@ -177,11 +177,13 @@ namespace MapNavKit
 
 						if (gridOrientation == GridOrientation.FlatTop)
 						{
-							grid[idx].localPosition = new Vector3(hori * x, nodeHeightStep * grid[idx].h, vert * z +
+							grid[idx].localPosition = new Vector3(hori * x, vert * z +
 								(x % 2 == 0 ?
 									(coordSystem == CoordinateSystem.EvenOffset ? offs : 0f) :
-									(coordSystem == CoordinateSystem.EvenOffset ? 0f : offs))
+									(coordSystem == CoordinateSystem.EvenOffset ? 0f : offs)),
+                  nodeHeightStep * grid[idx].h
 								);
+              grid[idx].parent.rotation = Quaternion.Euler(-90, 0, 0);
 						}
 						else
 						{
@@ -189,7 +191,9 @@ namespace MapNavKit
 								(z % 2 != 0 ?
 									(coordSystem == CoordinateSystem.EvenOffset ? 0f : offs) :
 									(coordSystem == CoordinateSystem.EvenOffset ? offs : 0f)),
-								nodeHeightStep * grid[idx].h, vert * z);
+                  vert * z,
+                  nodeHeightStep * grid[idx].h);
+              grid[idx].parent.rotation = Quaternion.Euler(-90, 0, 0);
 						}
 
 						grid[idx].localPosition += posOffs;
