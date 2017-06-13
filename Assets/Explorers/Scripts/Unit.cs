@@ -9,6 +9,7 @@ public class Unit : MonoBehaviour {
 
   public Tile tile { get; set; } // the tile that this unit is on
   public int MovesLeft { get; set; }
+  public float AgeInDays = 0;
 
   public delegate void OnMoveCompleted();
   private OnMoveCompleted onMoveCompleted = null; // callback to call when this unit is done moving
@@ -42,6 +43,8 @@ public class Unit : MonoBehaviour {
     // if t == null then this was simply an unlink and it ends here
     if (tile == null) return;
 
+    AgeInDays += Store.MoveCost.Get(tile.Type);
+    Debug.Log(string.Format("Traveled for {0} days", AgeInDays));
     // else tell the tile that this unit is on it
     tile.Unit = this;
     tile.Explored = true;
@@ -96,12 +99,16 @@ public class Unit : MonoBehaviour {
       transform.position = Vector3.Lerp(transform.position, targetPos, fracJourney);
 
       if (transform.position == targetPos) {
+
         if (nextPathIdx >= path.Count) {
           // reached end of path. link with new tile and tell controller i am done
           moving = false;
           LinkWithTile(path[path.Count - 1] as Tile);
           onMoveCompleted();
           return;
+        } else {
+          var tile = path[nextPathIdx] as Tile;
+          LinkWithTile(tile);
         }
 
         // go to next node

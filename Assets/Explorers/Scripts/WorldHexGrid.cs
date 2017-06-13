@@ -6,13 +6,16 @@ using MapNavKit;
 namespace Explorers {
 
   public class WorldHexGrid : MapNavHexa {
-    public GameObject player;
-    private TileFactory factory;
+    private TileFactory tileFactory;
+    private UnitFactory unitFactory;
+    private GameObject player;
 
     private List<GameObject> tiles = new List<GameObject>();
 
     public void Start() {
-      factory = GameObject.Find("Engine").GetComponent<TileFactory>();
+      tileFactory = GameObject.Find("Engine").GetComponent<TileFactory>();
+      unitFactory = GameObject.Find("Engine").GetComponent<UnitFactory>();
+      player = unitFactory.CreateRandomPlayer();
       CreateGrid<Tile>();
     }
 
@@ -38,7 +41,7 @@ namespace Explorers {
 
           // create a new tile
           var tile = (Tile)grid[idx];
-          factory.ConfigureRandomTile(tile);
+          tileFactory.ConfigureRandomTile(tile);
           GameObject go = Instantiate(tile.Sprite);
           go.name = "T" + idx.ToString();
           go.transform.position = grid[idx].position;
@@ -70,14 +73,13 @@ namespace Explorers {
     public void ExploreAroundTile(Tile tile) {
       foreach (var node in NodesAround<Tile>(tile, 1, null)) {
         node.Explored = true;
-        Debug.Log("explored: " + node);
       }
       tile.Explored = true;
     }
 
     protected virtual float OnNodeCostCallback(MapNavNode fromNode, MapNavNode toNode) {
       var tile = (Tile)toNode;
-      return tile.MoveCost;
+      return Store.MoveCost.Get(tile.Type);
     }
 
     protected void OnUnitMoveComplete() {
@@ -88,15 +90,12 @@ namespace Explorers {
         var result = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero);
         var go = result.collider.gameObject;
         var index = int.Parse(go.name.Remove(0, 1));
-        //player.transform.position = grid[index].position;
 
         var tile = (Tile)grid[index];
-        Debug.Log(tile.Type);
 
         var unit = player.GetComponent<Unit>();
 
         List<MapNavNode> path = Path<MapNavNode>(unit.tile, tile, OnNodeCostCallback);
-        Debug.Log(path.Count);
         if (path != null) {
           //unitMoving = true; // need to wait while unit is moving
           //ClearMoveMarkers();
