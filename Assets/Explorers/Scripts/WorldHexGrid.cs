@@ -96,7 +96,6 @@ namespace Explorers {
         var unit = player.GetComponent<Unit>();
 
         List<MapNavNode> path = Path<MapNavNode>(unit.tile, tile, OnNodeCostCallback);
-        Debug.Log(path.Count);
         if (path != null) {
           //unitMoving = true; // need to wait while unit is moving
           //ClearMoveMarkers();
