@@ -6,13 +6,16 @@ using MapNavKit;
 namespace Explorers {
 
   public class WorldHexGrid : MapNavHexa {
-    public GameObject player;
-    private TileFactory factory;
+    private TileFactory tileFactory;
+    private UnitFactory unitFactory;
+    private GameObject player;
 
     private List<GameObject> tiles = new List<GameObject>();
 
     public void Start() {
-      factory = GameObject.Find("Engine").GetComponent<TileFactory>();
+      tileFactory = GameObject.Find("Engine").GetComponent<TileFactory>();
+      unitFactory = GameObject.Find("Engine").GetComponent<UnitFactory>();
+      player = unitFactory.CreateRandomPlayer();
       CreateGrid<Tile>();
     }
 
@@ -38,7 +41,7 @@ namespace Explorers {
 
           // create a new tile
           var tile = (Tile)grid[idx];
-          factory.ConfigureRandomTile(tile);
+          tileFactory.ConfigureRandomTile(tile);
           GameObject go = Instantiate(tile.Sprite);
           go.name = "T" + idx.ToString();
           go.transform.position = grid[idx].position;
