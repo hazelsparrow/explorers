@@ -29,16 +29,4 @@ public class Tile : MapNavNode {
   void Update() {
 
   }
-
-  public float MoveCost {
-    get {
-      switch (Type) {
-        case TileType.Ocean:
-        case TileType.Mountain:
-          return 0f;
-        default:
-          return 1f;
-      }
-    }
-  }
 }

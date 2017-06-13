@@ -67,7 +67,6 @@ namespace Explorers {
       var currentTile = NodeAt<Tile>(0, 0);
       ExploreAroundTile(currentTile);
       player.GetComponent<Unit>().tile = currentTile;
-      Debug.Log(NodeAt<Tile>(0, 0).Explored);
       GameObject.Find("Engine").GetComponent<HexFog>().InitFog();
     }
 
@@ -80,7 +79,7 @@ namespace Explorers {
 
     protected virtual float OnNodeCostCallback(MapNavNode fromNode, MapNavNode toNode) {
       var tile = (Tile)toNode;
-      return tile.MoveCost;
+      return Store.MoveCost.Get(tile.Type);
     }
 
     protected void OnUnitMoveComplete() {
@@ -91,10 +90,8 @@ namespace Explorers {
         var result = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero);
         var go = result.collider.gameObject;
         var index = int.Parse(go.name.Remove(0, 1));
-        //player.transform.position = grid[index].position;
 
         var tile = (Tile)grid[index];
-        Debug.Log(tile.Type);
 
         var unit = player.GetComponent<Unit>();
 
