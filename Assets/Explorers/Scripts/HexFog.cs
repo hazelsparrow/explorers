@@ -16,6 +16,7 @@ public class HexFog : MonoBehaviour {
       Tile tile = (Tile)Map.grid[i];
       if (!tile.Explored && tile.isValid) {
         fogByTiles[tile] = Instantiate(Fog);
+        fogByTiles[tile].transform.parent = GameObject.Find("Fog").transform;
         fogByTiles[tile].transform.position = tile.position;
       }
     }
