@@ -1144,15 +1144,15 @@ namespace MapNavKit
 						{
 							float angle = angle_prec * (gridOrientation == GridOrientation.FlatTop ? (float)i : ((float)i + 0.5f));
 							float xi = grid[idx].position.x + nodeSize * Mathf.Cos(angle);
-							float zi = grid[idx].position.z + nodeSize * Mathf.Sin(angle);
+							float zi = grid[idx].position.y + nodeSize * Mathf.Sin(angle);
 							if (i == 0)
 							{
 								p1.x = xi;
-								p1.z = zi;
+								p1.y = zi;
 							}
 							else
 							{
-								p2 = new Vector3(xi, p2.y, zi);
+								p2 = new Vector3(xi, zi, p2.z);
 								Gizmos.DrawLine(p1, p2);
 								p1 = p2;
 							}

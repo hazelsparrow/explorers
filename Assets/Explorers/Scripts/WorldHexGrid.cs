@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using MapNavKit;
+using PhatRobit;
 
 namespace Explorers {
 
@@ -16,6 +17,7 @@ namespace Explorers {
       tileFactory = GameObject.Find("Engine").GetComponent<TileFactory>();
       unitFactory = GameObject.Find("Engine").GetComponent<UnitFactory>();
       player = unitFactory.CreateRandomPlayer();
+      Camera.main.GetComponent<SimpleRpgCamera>().target = player.transform;
       CreateGrid<Tile>();
     }
 
