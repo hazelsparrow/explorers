@@ -81,7 +81,7 @@ namespace Explorers {
 
     protected virtual float OnNodeCostCallback(MapNavNode fromNode, MapNavNode toNode) {
       var tile = (Tile)toNode;
-      return Store.MoveCost.Get(tile.Type);
+      return Store.MoveCost.Get(tile.Biome);
     }
 
     protected void OnUnitMoveComplete() {

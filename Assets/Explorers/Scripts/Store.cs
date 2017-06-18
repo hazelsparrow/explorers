@@ -2,27 +2,32 @@
 using System.Collections;
 
 public class MoveCost {
-  public float Get(TileType type) {
+  public float Get(Biome type) {
     switch (type) {
-      case TileType.Desert:
+      case Biome.Desert:
         return 20;
-      case TileType.Dirt:
+      case Biome.Dirt:
         return 10;
-      case TileType.Forest:
+      case Biome.Forest:
         return 20;
-      case TileType.Hills:
+      case Biome.Hills:
         return 20;
-      case TileType.Marsh:
+      case Biome.Marsh:
         return 25;
-      case TileType.Mountain:
+      case Biome.Mountain:
         return 45;
-      case TileType.Plains:
+      case Biome.Plains:
         return 10;
-      case TileType.Ocean:
+      case Biome.Ocean:
       default:
         return 0;
     }
   }
+}
+
+public class WorldGenerationSettings {
+  public int Width { get; set; }
+  public int Height { get; set; }
 }
 
 public class Store {

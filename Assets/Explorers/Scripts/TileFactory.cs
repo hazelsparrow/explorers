@@ -24,35 +24,35 @@ public class TileFactory : MonoBehaviour {
 
   public void ConfigureRandomTile(Tile tile) {
     var r = Random.Range(0, 8);
-    tile.Type = (TileType)r;
+    tile.Biome = (Biome)r;
 
     ConfigureTile(tile);
   }
 
   private void ConfigureTile(Tile tile) {
-    switch (tile.Type) {
-      case TileType.Desert:
+    switch (tile.Biome) {
+      case Biome.Desert:
         tile.Sprite = Desert;
         break;
-      case TileType.Dirt:
+      case Biome.Dirt:
         tile.Sprite = Dirt;
         break;
-      case TileType.Forest:
+      case Biome.Forest:
         tile.Sprite = Forest;
         break;
-      case TileType.Hills:
+      case Biome.Hills:
         tile.Sprite = Hills;
         break;
-      case TileType.Marsh:
+      case Biome.Marsh:
         tile.Sprite = Marsh;
         break;
-      case TileType.Mountain:
+      case Biome.Mountain:
         tile.Sprite = Mountain;
         break;
-      case TileType.Ocean:
+      case Biome.Ocean:
         tile.Sprite = Ocean;
         break;
-      case TileType.Plains:
+      case Biome.Plains:
         tile.Sprite = Plains;
         break;
       default:
