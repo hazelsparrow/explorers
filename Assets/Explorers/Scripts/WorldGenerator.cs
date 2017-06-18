@@ -23,7 +23,7 @@ public class TilesByBiome {
     tiles["snow0"] = Resources.LoadAll<Sprite>("Sprites/Tiles/cold_terrain_sheet_hex0");
     tiles["snow1"] = Resources.LoadAll<Sprite>("Sprites/Tiles/cold_terrain_sheet_hex1");
     tiles["desert0"] = Resources.LoadAll<Sprite>("Sprites/Tiles/painted_terrain_hexes_desert_256x384_sheet0");
-    tiles["desert1"] = Resources.LoadAll<Sprite>("Sprites/Tiles/painted_terrain_hexes_desert_256x384_sheet0");
+    tiles["desert1"] = Resources.LoadAll<Sprite>("Sprites/Tiles/painted_terrain_hexes_desert_256x384_sheet1");
     tiles["grass"] = Resources.LoadAll<Sprite>("Sprites/Tiles/terrain_hextiles_painted_basic_256x384");
 
     foreach (var key in tiles.Keys) {
@@ -36,11 +36,11 @@ public class TilesByBiome {
   public static Sprite Get(Tile tile) {
     switch (tile.Biome) {
       case Biome.Desert:
-        return tiles["desert1"][32];
+        return tiles["desert1"][0];
       case Biome.Grass:
-        return tiles["grass"][32];
+        return tiles["grass"][28];
       case Biome.Snow:
-        return tiles["snow0"][16];
+        return tiles["snow0"][32];
       default:
         throw new System.Exception("Biome not supported: " + tile.Biome);
     }
@@ -68,41 +68,52 @@ public class WorldGenerator {
 
   // Use this for initialization
   public void GenerateWorld() {
-    FastNoise myNoise = new FastNoise(); // Create a FastNoise object
-    myNoise.SetNoiseType(FastNoise.NoiseType.PerlinFractal); // Set the desired noise type
-    myNoise.SetSeed(Random.Range(0, int.MaxValue));
+    GenerateBiomes();
+    InstantiateTiles();
+  }
 
-    //float[,] heightMap = new float[map.mapHorizontalSize, map.mapVerticalSize]; // 2D heightmap to create terrain
+  FastNoise CreateBiomeNoise() {
+    var noise = new FastNoise();
+    noise.SetNoiseType(FastNoise.NoiseType.PerlinFractal); 
+    noise.SetSeed(Random.Range(0, int.MaxValue));
+    return noise;
+  }
 
-    for (int x = 0; x < map.mapHorizontalSize; x++) {
-      for (int y = 0; y < map.mapVerticalSize; y++) {
-        var noise = myNoise.GetNoise(x * 30, y * 30);
-        Debug.Log(noise);
-        var tile = map.NodeAt<Tile>(x, y);
-        if (noise < -0.1f) {
+  float HorizontalDistance(int i, int target, int maxDistance) {
+    return 1 - Mathf.Pow(Mathf.Abs(target - i) / Mathf.Abs(target - maxDistance), 2);
+  }
+
+  float NormalizedNoise(float noise) {
+    return (noise + 1f) / 2f;
+  }
+
+  void GenerateBiomes() {
+    FastNoise snowNoise = CreateBiomeNoise();
+    FastNoise grassNoise = CreateBiomeNoise();
+    FastNoise desertNoise = CreateBiomeNoise();
+    var width = map.mapHorizontalSize;
+    var height = map.mapVerticalSize;
+    var n = (int)(0.5 * width);
+    var g = 20;
+
+    for (int i = 0; i < width; i++) {
+      for (int j = 0; j < height; j++) {
+        var snow = NormalizedNoise(snowNoise.GetNoise(i * g, j * g)) * HorizontalDistance(i, 0, n);
+        var grass = NormalizedNoise(grassNoise.GetNoise(i * g, j * g)) * HorizontalDistance(i, n, n / 3);
+        var desert = NormalizedNoise(desertNoise.GetNoise(i * g, j * g)) * HorizontalDistance(i, 2 * n, n);
+        var max = Mathf.Max(snow, grass, desert);
+
+        var tile = map.NodeAt<Tile>(i, j);
+        Debug.Log(string.Format("i = {0}; snow = {1}; grass = {2}; desert = {3}", i, snow, grass, desert));
+        if (max == desert) {
           tile.Biome = Biome.Desert;
-        } else if (noise < 0.1f) {
+        } else if (max == grass) {
           tile.Biome = Biome.Grass;
         } else {
           tile.Biome = Biome.Snow;
         }
-        //map.grid[]
-        //heightMap[x, y] = (myNoise.GetNoise(x, y) + 1) / 2;
-        //if (heightMap[x, y] < 0.1f) {
-        //  heightMap[x, y] = 0;
-        //} else if (heightMap[x, y] < 0.3f) {
-        //  heightMap[x, y] = 0.2f;
-        //} else {
-        //  heightMap[x, y] = 0.4f;
-        //}
       }
     }
-
-    InstantiateTiles();
-
-  }
-
-  void GenerateBiomes() {
 
   }
 
