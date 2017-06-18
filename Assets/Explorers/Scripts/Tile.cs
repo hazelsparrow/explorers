@@ -66,9 +66,9 @@ public enum Place {
 }
 
 public class Tile : MapNavNode {
-  public Biome? Biome = null;
-  public Feature? Feature = null;
-  public Place? Place = null;
+  public Biome Biome = Biome.Grass;
+  public Feature Feature = Feature.None;
+  public Place Place = Place.None;
   public Unit Unit = null;
   public bool Explored = false;
 
