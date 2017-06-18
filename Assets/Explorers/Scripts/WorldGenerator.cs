@@ -36,11 +36,11 @@ public class TilesByBiome {
   public static Sprite Get(Tile tile) {
     switch (tile.Biome) {
       case Biome.Desert:
-        return tiles["desert1"][0];
+        return tiles["desert1"][32];
       case Biome.Grass:
-        return tiles["grass"][0];
+        return tiles["grass"][32];
       case Biome.Snow:
-        return tiles["snow1"][8];
+        return tiles["snow0"][16];
       default:
         throw new System.Exception("Biome not supported: " + tile.Biome);
     }
@@ -76,11 +76,12 @@ public class WorldGenerator {
 
     for (int x = 0; x < map.mapHorizontalSize; x++) {
       for (int y = 0; y < map.mapVerticalSize; y++) {
-        var noise = (myNoise.GetNoise(x, y) + 1) / 2;
+        var noise = myNoise.GetNoise(x * 30, y * 30);
+        Debug.Log(noise);
         var tile = map.NodeAt<Tile>(x, y);
-        if (noise < 0.2f) {
+        if (noise < -0.1f) {
           tile.Biome = Biome.Desert;
-        } else if (noise < 0.4f) {
+        } else if (noise < 0.1f) {
           tile.Biome = Biome.Grass;
         } else {
           tile.Biome = Biome.Snow;
