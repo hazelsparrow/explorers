@@ -93,7 +93,7 @@ public class WorldGenerator {
       GameObject go = Object.Instantiate(Prefabs.Instance.Tile);
       go.name = "T" + i;
       go.transform.position = map.grid[i].position;
-      go.transform.parent = map.transform.parent;
+      go.transform.parent = map.gameObject.transform.parent;
       go.GetComponent<SpriteRenderer>().sprite = TilesByBiome.Get((Tile)map.grid[i]);
     }
   }
