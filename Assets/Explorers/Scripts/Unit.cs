@@ -43,7 +43,7 @@ public class Unit : MonoBehaviour {
     // if t == null then this was simply an unlink and it ends here
     if (tile == null) return;
 
-    AgeInDays += Store.MoveCost.Get(tile.Type);
+    AgeInDays += Store.MoveCost.Get(tile.Biome);
     Debug.Log(string.Format("Traveled for {0} days", AgeInDays));
     // else tell the tile that this unit is on it
     tile.Unit = this;

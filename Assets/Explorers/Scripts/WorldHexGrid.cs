@@ -2,20 +2,20 @@
 using System.Collections;
 using System.Collections.Generic;
 using MapNavKit;
+using PhatRobit;
 
 namespace Explorers {
 
   public class WorldHexGrid : MapNavHexa {
-    private TileFactory tileFactory;
     private UnitFactory unitFactory;
     private GameObject player;
 
     private List<GameObject> tiles = new List<GameObject>();
 
     public void Start() {
-      tileFactory = GameObject.Find("Engine").GetComponent<TileFactory>();
       unitFactory = GameObject.Find("Engine").GetComponent<UnitFactory>();
       player = unitFactory.CreateRandomPlayer();
+      Camera.main.GetComponent<SimpleRpgCamera>().target = player.transform;
       CreateGrid<Tile>();
     }
 
@@ -34,19 +34,8 @@ namespace Explorers {
           }
         }
 
-        // Place tiles according to the generated grid
-        for (int idx = 0; idx < grid.Length; idx++) {
-          // make sure it is a valid node before placing tile here
-          if (false == grid[idx].isValid) continue;
-
-          // create a new tile
-          var tile = (Tile)grid[idx];
-          tileFactory.ConfigureRandomTile(tile);
-          GameObject go = Instantiate(tile.Sprite);
-          go.name = "T" + idx.ToString();
-          go.transform.position = grid[idx].position;
-          go.transform.parent = parent;
-        }
+        var generator = new WorldGenerator(this);
+        generator.GenerateWorld();
       }
 
       // else, simply update the position of existing tiles
@@ -79,7 +68,7 @@ namespace Explorers {
 
     protected virtual float OnNodeCostCallback(MapNavNode fromNode, MapNavNode toNode) {
       var tile = (Tile)toNode;
-      return Store.MoveCost.Get(tile.Type);
+      return Store.MoveCost.Get(tile.Biome);
     }
 
     protected void OnUnitMoveComplete() {
