@@ -63,7 +63,7 @@ public class TilesByBiome {
       case Biome.Snow:
         switch (tile.Feature) {
           case Feature.SnowIcebergs:
-            return RandomSprite("grass", 24);
+            return RandomSprite("snow0", 24);
           case Feature.SnowForest:
             return RandomSpriteFromPool("snow0", 6, 7, 8, 9, 10, 11, 12, 13, 14);
           case Feature.SnowHills:
@@ -132,8 +132,8 @@ public class WorldGenerator {
         var feature = Feature.None;
 
         var forest = NormalizedNoise(forestNoise.GetNoise(i * STEP, j * STEP));
-        var ocean = NormalizedNoise(forestNoise.GetNoise(i * STEP, j * STEP));
-        var height = NormalizedNoise(forestNoise.GetNoise(i * STEP, j * STEP));
+        var ocean = NormalizedNoise(oceanNoise.GetNoise(i * STEP, j * STEP)) * (1 - HorizontalDistance(j, map.mapVerticalSize / 2, map.mapVerticalSize / 8) + 1 - HorizontalDistance(i, map.mapHorizontalSize / 2, map.mapHorizontalSize / 8) + 1);
+        var height = NormalizedNoise(heightNoise.GetNoise(i * STEP, j * STEP));
 
         if (height < 0.5f) {
           if (ocean > 0.5f) {
