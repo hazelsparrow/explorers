@@ -70,11 +70,15 @@ public class FastNoise
 
 	private FN_DECIMAL m_gradientPerturbAmp = (FN_DECIMAL)1.0;
 
-	public FastNoise(int seed = 1337)
+	public FastNoise()
 	{
-		m_seed = seed;
+    m_seed = UnityEngine.Random.Range(0, int.MaxValue);
 		CalculateFractalBounding();
 	}
+
+  public FastNoise(NoiseType noiseType) : this() {
+    m_noiseType = noiseType;
+  }
 
 	// Returns a 0 float/double
 	public static FN_DECIMAL GetDecimalType() { return 0; }
