@@ -80,11 +80,12 @@ public class TilesByBiome {
 }
 
 public class WorldGenerator {
-  //public Terrain terrain;
   public WorldHexGrid map;
+  public Terrain terrain;
 
   public WorldGenerator(WorldHexGrid map) {
     this.map = map;
+    this.terrain = GameObject.Find("Terrain").GetComponent<Terrain>();
   }
 
   void InstantiateTiles() {
@@ -98,7 +99,6 @@ public class WorldGenerator {
     }
   }
 
-  // Use this for initialization
   public void GenerateWorld() {
     GenerateBiomes();
     GenerateFeatures();
@@ -111,8 +111,8 @@ public class WorldGenerator {
     return noise;
   }
 
-  float HorizontalDistance(int i, int target, int maxDistance) {
-    return 1 - Mathf.Pow(Mathf.Abs(target - i) / Mathf.Abs(target - maxDistance), 2);
+  float Proximity(int value, int target, int maxDistance) {
+    return Mathf.Clamp01(1 - Mathf.Pow((float)(value - target) / maxDistance, 2));
   }
 
   float NormalizedNoise(float noise) {
@@ -124,6 +124,7 @@ public class WorldGenerator {
     FastNoise oceanNoise = new FastNoise(FastNoise.NoiseType.SimplexFractal);
     FastNoise heightNoise = new FastNoise(FastNoise.NoiseType.PerlinFractal);
     var STEP = 20;
+    var testHeightMap = new float[map.mapHorizontalSize, map.mapVerticalSize];
 
     for (int i = 0; i < map.mapHorizontalSize; i++) {
       for (int j = 0; j < map.mapVerticalSize; j++) {
@@ -131,52 +132,64 @@ public class WorldGenerator {
         var biome = tile.Biome;
         var feature = Feature.None;
 
+        ////var oceanWeight = (2 - HorizontalDistance(j, map.mapVerticalSize / 2, map.mapVerticalSize / 8) - HorizontalDistance(i, map.mapHorizontalSize / 2, map.mapHorizontalSize / 8));
+        //var oceanWeight = 1 - HorizontalDistance(j, map.mapVerticalSize / 2, map.mapVerticalSize / 8);
+
         var forest = NormalizedNoise(forestNoise.GetNoise(i * STEP, j * STEP));
-        var ocean = NormalizedNoise(oceanNoise.GetNoise(i * STEP, j * STEP)) * (1 - HorizontalDistance(j, map.mapVerticalSize / 2, map.mapVerticalSize / 8) + 1 - HorizontalDistance(i, map.mapHorizontalSize / 2, map.mapHorizontalSize / 8) + 1);
+        var ocean = NormalizedNoise(oceanNoise.GetNoise(i * STEP, j * STEP));
         var height = NormalizedNoise(heightNoise.GetNoise(i * STEP, j * STEP));
 
-        if (height < 0.5f) {
-          if (ocean > 0.5f) {
-            switch (biome) {
-              case Biome.Snow:
-                feature = Feature.SnowIcebergs;
-                break;
-              default:
-                feature = Feature.GrassOcean;
-                break;
-            }
-          } else {
-            if (forest > 0.5f) {
-              switch (biome) {
-                case Biome.Desert:
-                  feature = forest > 0.7f ? Feature.DesertCactiForest : Feature.DesertForest;
-                  break;
-                case Biome.Grass:
-                  feature = Feature.GrassForest;
-                  break;
-                case Biome.Snow:
-                  feature = Feature.SnowForest;
-                  break;
-              }
-            }
-          }
-        } else { // height > 0.5
-          switch (biome) {
-            case Biome.Desert:
-              feature = height > 0.7f ? Feature.DesertMountain : Feature.DesertHills;
-              break;
-            case Biome.Grass:
-              feature = height > 0.7f ? Feature.GrassMountain : Feature.GrassHills;
-              break;
-            case Biome.Snow:
-              feature = height > 0.7f ? Feature.SnowMountain : Feature.SnowHills;
-              break;
-          }
+        testHeightMap[i, j] = ocean;
+
+        if (i == 0 || j == 0 || i == map.mapHorizontalSize - 1 || j == map.mapVerticalSize - 1) {
+          feature = biome == Biome.Snow ? Feature.SnowIcebergs : Feature.GrassOcean;
         }
+
+
+        //if (height < 0.5f) {
+        //  if (ocean > 0.5f) {
+        //    switch (biome) {
+        //      case Biome.Snow:
+        //        feature = Feature.SnowIcebergs;
+        //        break;
+        //      default:
+        //        feature = Feature.GrassOcean;
+        //        break;
+        //    }
+        //  } else {
+        //    if (forest > 0.5f) {
+        //      switch (biome) {
+        //        case Biome.Desert:
+        //          feature = forest > 0.7f ? Feature.DesertCactiForest : Feature.DesertForest;
+        //          break;
+        //        case Biome.Grass:
+        //          feature = Feature.GrassForest;
+        //          break;
+        //        case Biome.Snow:
+        //          feature = Feature.SnowForest;
+        //          break;
+        //      }
+        //    }
+        //  }
+        //} else { // height > 0.5
+        //  switch (biome) {
+        //    case Biome.Desert:
+        //      feature = height > 0.7f ? Feature.DesertMountain : Feature.DesertHills;
+        //      break;
+        //    case Biome.Grass:
+        //      feature = height > 0.7f ? Feature.GrassMountain : Feature.GrassHills;
+        //      break;
+        //    case Biome.Snow:
+        //      feature = height > 0.7f ? Feature.SnowMountain : Feature.SnowHills;
+        //      break;
+        //  }
+        //}
 
         tile.Feature = feature;
       }
     }
+
+    terrain.terrainData.SetHeights(0, 0, testHeightMap);
   }
 
   void GenerateBiomes() {
@@ -185,29 +198,40 @@ public class WorldGenerator {
     FastNoise desertNoise = CreateBiomeNoise();
     var n = (int)(0.5 * map.mapHorizontalSize);
     var STEP = 20;
+    var totalSnow = 0;
+    var totalDesert = 0;
+    var totalGrass = 0;
+
+    var testHeightMap = new float[map.mapHorizontalSize, map.mapVerticalSize];
 
     for (int i = 0; i < map.mapHorizontalSize; i++) {
       for (int j = 0; j < map.mapVerticalSize; j++) {
-        var snow = NormalizedNoise(snowNoise.GetNoise(i * STEP, j * STEP)) * HorizontalDistance(i, 0, n);
-        var grass = NormalizedNoise(grassNoise.GetNoise(i * STEP, j * STEP)) * HorizontalDistance(i, n, n / 3);
-        var desert = NormalizedNoise(desertNoise.GetNoise(i * STEP, j * STEP)) * HorizontalDistance(i, 2 * n, n);
+        var snow = NormalizedNoise(snowNoise.GetNoise(i * STEP, j * STEP)) * Proximity(i, 0, 2 * n);
+        var grass = NormalizedNoise(grassNoise.GetNoise(i * STEP, j * STEP)) * Proximity(i, n, n);
+        var desert = NormalizedNoise(desertNoise.GetNoise(i * STEP, j * STEP)) * Proximity(i, 2 * n, 2 * n);
         var max = Mathf.Max(snow, grass, desert);
+        if (j <= 10) {
+          testHeightMap[i, j] = Proximity(i, 0, n);
+        } else if (j <= 20) {
+          testHeightMap[i, j] = Proximity(i, n, n / 2);
+        } else {
+          testHeightMap[i, j] = Proximity(i, 2 * n, n);
+        }
 
         var tile = map.NodeAt<Tile>(i, j);
         if (max == desert) {
           tile.Biome = Biome.Desert;
+          totalDesert += 1;
         } else if (max == grass) {
           tile.Biome = Biome.Grass;
+          totalGrass += 1;
         } else {
           tile.Biome = Biome.Snow;
+          totalSnow += 1;
         }
       }
     }
-
-  }
-
-  // Update is called once per frame
-  void Update() {
-
+    //terrain.terrainData.SetHeights(0, 0, testHeightMap);
+    Debug.Log(string.Format("snow = {0}%, desert = {1}%, grass = {2}%", totalSnow / 30f, totalDesert / 30f, totalGrass / 30f));
   }
 }
