@@ -6,10 +6,10 @@ public class Prefabs : MonoBehaviour {
 
   // Use this for initialization
   void Start() {
-    if (instance != null) {
-      throw new System.Exception("Only one prefabs library is allowed.");
-    }
-    instance = this;
+    //if (instance != null) {
+    //  throw new System.Exception("Only one prefabs library is allowed.");
+    //}
+    //instance = this;
   }
 
   // Update is called once per frame
@@ -20,6 +20,9 @@ public class Prefabs : MonoBehaviour {
   private static Prefabs instance = null;
   public static Prefabs Instance {
     get {
+      if (instance == null) {
+        instance = GameObject.Find("Engine").GetComponent<Prefabs>();
+      }
       return instance;
     }
   }
