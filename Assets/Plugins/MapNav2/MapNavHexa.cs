@@ -137,8 +137,7 @@ namespace MapNavKit
 							py = nodeSize * Mathf.Sqrt(3) * (y + x * 0.5f);
 						}
 
-						grid[idx].localPosition = new Vector3(px, py, nodeHeightStep * grid[idx].h);
-            grid[idx].parent.rotation = Quaternion.Euler(-90, 0, 0);
+						grid[idx].localPosition = new Vector3(px, nodeHeightStep * grid[idx].h, py);
 
 						OnNodeCreated(grid[idx]);
 					}
@@ -177,13 +176,11 @@ namespace MapNavKit
 
 						if (gridOrientation == GridOrientation.FlatTop)
 						{
-							grid[idx].localPosition = new Vector3(hori * x, vert * z +
+							grid[idx].localPosition = new Vector3(hori * x, nodeHeightStep * grid[idx].h, vert * z +
 								(x % 2 == 0 ?
 									(coordSystem == CoordinateSystem.EvenOffset ? offs : 0f) :
-									(coordSystem == CoordinateSystem.EvenOffset ? 0f : offs)),
-                  nodeHeightStep * grid[idx].h
+									(coordSystem == CoordinateSystem.EvenOffset ? 0f : offs))
 								);
-              grid[idx].parent.rotation = Quaternion.Euler(-90, 0, 0);
 						}
 						else
 						{
@@ -191,9 +188,7 @@ namespace MapNavKit
 								(z % 2 != 0 ?
 									(coordSystem == CoordinateSystem.EvenOffset ? 0f : offs) :
 									(coordSystem == CoordinateSystem.EvenOffset ? offs : 0f)),
-                  vert * z,
-                  nodeHeightStep * grid[idx].h);
-              grid[idx].parent.rotation = Quaternion.Euler(-90, 0, 0);
+								nodeHeightStep * grid[idx].h, vert * z);
 						}
 
 						grid[idx].localPosition += posOffs;
@@ -1144,15 +1139,15 @@ namespace MapNavKit
 						{
 							float angle = angle_prec * (gridOrientation == GridOrientation.FlatTop ? (float)i : ((float)i + 0.5f));
 							float xi = grid[idx].position.x + nodeSize * Mathf.Cos(angle);
-							float zi = grid[idx].position.y + nodeSize * Mathf.Sin(angle);
+							float zi = grid[idx].position.z + nodeSize * Mathf.Sin(angle);
 							if (i == 0)
 							{
 								p1.x = xi;
-								p1.y = zi;
+								p1.z = zi;
 							}
 							else
 							{
-								p2 = new Vector3(xi, zi, p2.z);
+								p2 = new Vector3(xi, p2.y, zi);
 								Gizmos.DrawLine(p1, p2);
 								p1 = p2;
 							}

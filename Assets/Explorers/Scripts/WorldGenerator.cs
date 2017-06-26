@@ -95,12 +95,18 @@ public class WorldGenerator {
 
   void InstantiateTiles() {
     TilesByBiome.Load();
+    var hexGridGo = GameObject.Find("HexGrid");
+    var height = map.mapVerticalSize;
+
     for (int i = 0; i < map.grid.Length; i++) {
+      var tile = (Tile)map.grid[i];
       GameObject go = Object.Instantiate(Prefabs.Instance.Tile);
       go.name = "T" + i;
       go.transform.position = map.grid[i].position;
-      go.transform.parent = map.gameObject.transform.parent;
-      go.GetComponent<SpriteRenderer>().sprite = TilesByBiome.Get((Tile)map.grid[i]);
+      hexGridGo.AddChild(go);
+      var spriteRenderer = go.GetComponent<SpriteRenderer>();
+      spriteRenderer.sprite = TilesByBiome.Get(tile);
+      spriteRenderer.sortingOrder = height - tile.r;
     }
   }
 

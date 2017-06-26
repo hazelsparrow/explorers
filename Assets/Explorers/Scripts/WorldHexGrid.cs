@@ -76,25 +76,20 @@ namespace Explorers {
 
     protected void Update() {
       if (Input.GetMouseButtonDown(0)) {
-        var result = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero);
-        var go = result.collider.gameObject;
-        var index = int.Parse(go.name.Remove(0, 1));
-
-        var tile = (Tile)grid[index];
-
-        var unit = player.GetComponent<Unit>();
-
-        List<MapNavNode> path = Path<MapNavNode>(unit.tile, tile, OnNodeCostCallback);
-        if (path != null) {
-          //unitMoving = true; // need to wait while unit is moving
-          //ClearMoveMarkers();
-          unit.Move(path, OnUnitMoveComplete);
+        Ray r = Camera.main.ScreenPointToRay(Input.mousePosition);
+        RaycastHit hit;
+        if (Physics.Raycast(r, out hit)) {
+          Debug.Log(hit.point);
+          var tile = NodeAtWorldPosition<Tile>(hit.point);
+          var unit = player.GetComponent<Unit>();
+          List<MapNavNode> path = Path<MapNavNode>(unit.tile, tile, OnNodeCostCallback);
+          if (path != null) {
+            //unitMoving = true; // need to wait while unit is moving
+            //ClearMoveMarkers();
+            unit.Move(path, OnUnitMoveComplete);
+          }
         }
       }
-
-
     }
-
-    // ------------------------------------------------------------------------------------------------------------
   }
 }
